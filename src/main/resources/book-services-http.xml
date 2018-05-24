@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/http
+    http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
+
+	<!--init setup-->
+	<int:annotation-config/>
+	<context:component-scan base-package="com.example.si"/>
+
+
+	<bean id="bookService" class="com.example.si.BookService"/>
+
+	<bean id="bookControllerBean"
+		  class="com.example.si.BookController">
+		<constructor-arg name="bookService" ref="bookService" />
+	</bean>
+
+	<!--_________________________________-->
+	<!--|  GET endpoint|-->
+	<!--|________________________________|-->
+	<int:channel id="requestChannel" />
+	<int:channel id="outputChannel" />
+
+	<bean id="bookErrorManager" class="com.example.si.BookErrorHandler"/>
+	<int:channel id="book-error-channel"/>
+	<int:service-activator input-channel="book-error-channel"
+						   output-channel="outputChannel"
+						   method="bookErrorTranslator" ref="bookErrorManager"/>
+
+	<int-http:inbound-gateway supported-methods="GET"
+							  path="/services/books/{bookId}"
+							  request-channel="requestChannel"
+							  reply-channel="outputChannel"
+							  error-channel="book-error-channel">
+		<int-http:header name="#{T(com.example.si.header.SampleMessageHeaderAccessor).BOOK_ID}"
+						 expression="#pathVariables.bookId"/>
+	</int-http:inbound-gateway>
+
+
+	<int:service-activator input-channel="requestChannel" output-channel="outputChannel" ref="bookControllerBean" method="get"/>
+
+</beans>
