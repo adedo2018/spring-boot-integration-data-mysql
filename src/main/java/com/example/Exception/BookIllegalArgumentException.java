@@ -1,5 +1,5 @@
 
-package com.example.si.Exception;
+package com.example.Exception;
 
 public class BookIllegalArgumentException extends RuntimeException {
 

@@ -1,10 +1,10 @@
 
-package com.example.si;
+package com.example.Exception.handler;
 
 import static org.springframework.integration.support.MessageBuilder.withPayload;
 
 
-import com.example.si.Exception.BookIllegalArgumentException;
+import com.example.Exception.BookIllegalArgumentException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +15,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.ErrorMessage;
 
 import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
 
 
 public class BookErrorHandler {
@@ -34,8 +36,13 @@ public class BookErrorHandler {
     }
 
     private HttpStatus returnHttpStatusCode(Throwable cause){
+
         if (cause instanceof BookIllegalArgumentException){
             return HttpStatus.BAD_REQUEST;
+        }
+
+        if (cause instanceof EntityNotFoundException){
+            return HttpStatus.NOT_FOUND;
         }
 
         return HttpStatus.INTERNAL_SERVER_ERROR;

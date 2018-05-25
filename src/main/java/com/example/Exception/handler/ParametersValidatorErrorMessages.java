@@ -1,5 +1,5 @@
 
-package com.example.si;
+package com.example.Exception.handler;
 
 
 public enum ParametersValidatorErrorMessages {

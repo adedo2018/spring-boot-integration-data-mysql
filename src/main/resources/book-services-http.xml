@@ -15,15 +15,8 @@
 
 	<!--init setup-->
 	<int:annotation-config/>
-	<context:component-scan base-package="com.example.si"/>
-
-
-	<bean id="bookService" class="com.example.si.BookService"/>
-
-	<bean id="bookControllerBean"
-		  class="com.example.si.BookController">
-		<constructor-arg name="bookService" ref="bookService" />
-	</bean>
+	<context:component-scan base-package="com.example"/>
+	<context:component-scan base-package="com.example.controller"/>
 
 	<!--_________________________________-->
 	<!--|  GET endpoint|-->
@@ -31,22 +24,21 @@
 	<int:channel id="requestChannel" />
 	<int:channel id="outputChannel" />
 
-	<bean id="bookErrorManager" class="com.example.si.BookErrorHandler"/>
+	<bean id="bookErrorHandler" class="com.example.Exception.handler.BookErrorHandler"/>
 	<int:channel id="book-error-channel"/>
 	<int:service-activator input-channel="book-error-channel"
 						   output-channel="outputChannel"
-						   method="bookErrorTranslator" ref="bookErrorManager"/>
+						   method="bookErrorTranslator" ref="bookErrorHandler"/>
 
 	<int-http:inbound-gateway supported-methods="GET"
 							  path="/services/books/{bookId}"
 							  request-channel="requestChannel"
 							  reply-channel="outputChannel"
 							  error-channel="book-error-channel">
-		<int-http:header name="#{T(com.example.si.header.SampleMessageHeaderAccessor).BOOK_ID}"
+		<int-http:header name="#{T(com.example.header.SampleMessageHeaderAccessor).BOOK_ID}"
 						 expression="#pathVariables.bookId"/>
 	</int-http:inbound-gateway>
 
-
-	<int:service-activator input-channel="requestChannel" output-channel="outputChannel" ref="bookControllerBean" method="get"/>
+	<int:service-activator input-channel="requestChannel" output-channel="outputChannel" ref="bookController" method="get"/>
 
 </beans>

@@ -1,8 +1,8 @@
 
-package com.example.si;
+package com.example.Exception.handler;
 
 
-import com.example.si.Exception.BookIllegalArgumentException;
+import com.example.Exception.BookIllegalArgumentException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -15,7 +15,7 @@ public class BookParametersValidator {
 
     private BookParametersValidator(){}
 
-    static long validateLongParameterForNonNull(String stringNumber, String message){
+    public static long validateLongParameterForNonNull(String stringNumber, String message){
 
         LOG.info("BookParametersValidator validateLongParameterForNonNull method");
 
